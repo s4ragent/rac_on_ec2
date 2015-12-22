@@ -1,0 +1,56 @@
+- vars_files:
+    - ./vars.yml
+  hosts: localhost
+  sudo: yes
+  gather_facts: false
+  tasks:
+
+    - name: delete known_hosts
+      local_action: file state=absent dest=known_hosts
+    
+    - name: delete id_rsa.pub 
+      local_action: file state=absent dest=id_rsa.pub
+    
+    - name: delete id_rsa 
+      local_action: file state=absent dest=id_rsa
+
+- vars_files:
+    - ./vars.yml
+  remote_user: root
+  sudo: yes
+  hosts: 
+    - node1
+    - node_other
+  gather_facts: true
+  tasks:
+    - name: route
+      shell: route del -net 169.254.0.0 netmask 255.255.0.0 dev vxlan0
+      ignore_errors: yes
+    - name: route
+      shell: route del -net 169.254.0.0 netmask 255.255.0.0 dev vxlan1
+      ignore_errors: yes
+    - name: route
+      shell: route add -net 169.254.0.0 netmask 255.255.0.0 dev eth0 metric 0
+      ignore_errors: yes
+
+    # fetch instance data from the metadata servers in ec2
+    - ec2_facts:
+      ignore_errors: yes
+    
+    - name: delete imgfile
+      file: dest={{ CRS_DEV }} state=absent
+      run_once: true
+    
+    - name: shutdown
+      shell: shutdown -h now 
+      ignore_errors: yes
+
+    - name: terminate of instances
+      local_action: ec2
+        region={{ region }}
+        instance_ids={{ hostvars[inventory_hostname]['ansible_ec2_instance_id'] }}
+        state='absent'
+      ignore_errors: yes
+
+    - name: update ip file
+      local_action: lineinfile state=absent insertafter=EOF line={{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }} dest=/etc/vxlan/all.ip

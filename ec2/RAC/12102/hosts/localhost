@@ -1,0 +1,68 @@
+[localhost]
+127.0.0.1
+
+[node1]
+192.168.0.51 fqdn=node001.public hostname=node001 
+
+[node_other]
+192.168.0.52 fqdn=node002.public hostname=node002
+192.168.0.53 fqdn=node003.public hostname=node003
+192.168.0.54 fqdn=node004.public hostname=node004
+192.168.0.55 fqdn=node005.public hostname=node005
+192.168.0.56 fqdn=node006.public hostname=node006
+192.168.0.57 fqdn=node007.public hostname=node007
+192.168.0.58 fqdn=node008.public hostname=node008
+192.168.0.59 fqdn=node009.public hostname=node009
+192.168.0.60 fqdn=node010.public hostname=node010
+192.168.0.61 fqdn=node011.public hostname=node011
+192.168.0.62 fqdn=node012.public hostname=node012
+192.168.0.63 fqdn=node013.public hostname=node013
+192.168.0.64 fqdn=node014.public hostname=node014
+192.168.0.65 fqdn=node015.public hostname=node015
+192.168.0.66 fqdn=node016.public hostname=node016
+192.168.0.67 fqdn=node017.public hostname=node017
+192.168.0.68 fqdn=node018.public hostname=node018
+192.168.0.69 fqdn=node019.public hostname=node019
+192.168.0.70 fqdn=node020.public hostname=node020
+192.168.0.71 fqdn=node021.public hostname=node021
+192.168.0.72 fqdn=node022.public hostname=node022
+192.168.0.73 fqdn=node023.public hostname=node023
+192.168.0.74 fqdn=node024.public hostname=node024
+192.168.0.75 fqdn=node025.public hostname=node025
+192.168.0.76 fqdn=node026.public hostname=node026
+192.168.0.77 fqdn=node027.public hostname=node027
+192.168.0.78 fqdn=node028.public hostname=node028
+192.168.0.79 fqdn=node029.public hostname=node029
+192.168.0.80 fqdn=node030.public hostname=node030
+192.168.0.81 fqdn=node031.public hostname=node031
+192.168.0.82 fqdn=node032.public hostname=node032
+192.168.0.83 fqdn=node033.public hostname=node033
+192.168.0.84 fqdn=node034.public hostname=node034
+192.168.0.85 fqdn=node035.public hostname=node035
+192.168.0.86 fqdn=node036.public hostname=node036
+192.168.0.87 fqdn=node037.public hostname=node037
+192.168.0.88 fqdn=node038.public hostname=node038
+192.168.0.89 fqdn=node039.public hostname=node039
+192.168.0.90 fqdn=node040.public hostname=node040
+192.168.0.91 fqdn=node041.public hostname=node041
+192.168.0.92 fqdn=node042.public hostname=node042
+192.168.0.93 fqdn=node043.public hostname=node043
+192.168.0.94 fqdn=node044.public hostname=node044
+192.168.0.95 fqdn=node045.public hostname=node045
+192.168.0.96 fqdn=node046.public hostname=node046
+192.168.0.97 fqdn=node047.public hostname=node047
+192.168.0.98 fqdn=node048.public hostname=node048
+192.168.0.99 fqdn=node049.public hostname=node049
+192.168.0.100 fqdn=node050.public hostname=node050
+192.168.0.101 fqdn=node051.public hostname=node051
+192.168.0.102 fqdn=node052.public hostname=node052
+192.168.0.103 fqdn=node053.public hostname=node053
+192.168.0.104 fqdn=node054.public hostname=node054
+192.168.0.105 fqdn=node055.public hostname=node055
+192.168.0.106 fqdn=node056.public hostname=node056
+192.168.0.107 fqdn=node057.public hostname=node057
+192.168.0.108 fqdn=node058.public hostname=node058
+192.168.0.109 fqdn=node059.public hostname=node059
+192.168.0.110 fqdn=node060.public hostname=node060
+192.168.0.111 fqdn=node061.public hostname=node061
+192.168.0.112 fqdn=node062.public hostname=node062

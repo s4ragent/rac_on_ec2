@@ -1,0 +1,12 @@
+instance_type : t2.micro
+#Virginia: ami-d2166bba
+#Oregon: ami-5d356a6d
+#Tokyo: ami-c66b78c7
+count : 1
+common_name : "base"
+instance_tag : "{{ common_name }}"
+BootOrder : "{{ common_name }}1st"
+Name_tag : "tag_Name_{{ instance_tag }}"
+WORK_DIR : /root/work
+swap_file_path : /swap.img
+swap_file_size_mb : 4092

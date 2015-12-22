@@ -1,0 +1,227 @@
+- vars_files:
+    - ./common.yml
+  hosts:
+    - localhost
+  gather_facts: no
+  tasks:
+    - name: Provision a set of instances
+      local_action:
+        module: ec2
+        keypair: "{{ keypair }}"
+        instance_type: "{{ instance_type }}"
+        image: "{{ image }}"
+        count: 1
+        group: "{{ group }}"
+        region: "{{ region }}"
+        wait: true
+        volumes:
+          - device_name: /dev/sdf
+            device_type: gp2
+            volume_size: 12
+            delete_on_termination: true
+      run_once: true
+      register: ec2
+
+    - name: Add new instance to host group
+      local_action: add_host hostname={{ item.public_ip }} groupname=launched
+      with_items: ec2.instances
+
+    - name: Wait for SSH to come up
+      local_action: wait_for host={{ item.public_dns_name }} port=22 delay=120 timeout=320 state=started
+      with_items: ec2.instances
+
+- vars_files:
+    - ./common.yml
+  hosts:
+    - launched
+  remote_user: ec2-user
+  sudo: yes
+  tasks:
+    - ec2_facts:
+
+    - name: libselinux-python
+      yum: name=libselinux-python state=installed
+
+    - name: "copy osinstall shell"
+      copy: src=osinstall.sh dest=/home/ec2-user mode=755
+
+    - name: os install
+      shell: >-
+        bash -c "./osinstall.sh"
+
+    - local_action: shell bash awscli.sh createimage "{{ ansible_ec2_instance_id }}" /dev/sdf "{{ region }}"
+      register: amiid
+
+    - debug: var=amiid
+
+    - local_action:
+        module: ec2
+        state: 'absent'
+        instance_ids: "{{ ansible_ec2_instance_id }}"
+        region: "{{region}}"
+
+    - name: Provision a set of instances
+      local_action:
+        module: ec2
+        keypair: "{{ keypair }}"
+        instance_type: m3.medium
+        image: "{{ amiid.stdout }}"
+        count: 1
+        group: "{{ group }}"
+        region: "{{ region }}"
+        wait: true
+      run_once: true
+      register: ec
+
+    - name: Add new instance to host group
+      local_action: add_host hostname={{ item.public_ip }} groupname=launched2
+      with_items: ec.instances
+
+    - name: Wait for SSH to come up
+      local_action: wait_for host={{ item.public_dns_name }} port=22 delay=240 timeout=320 state=started
+      with_items: ec.instances
+ 
+- vars_files:
+    - ./common.yml
+  hosts:
+    - launched2
+  remote_user: root
+  tasks:
+    - ec2_facts:
+
+    - name: "create work directory"
+      file: dest={{ WORK_DIR }} state=directory
+
+    - name: install epel
+      yum: name=http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm state=installed
+
+    - name: yum group-install
+      yum: name="{{ item }}" state=present
+      with_items:
+        - "@Desktop"
+        - "@X Window System"
+        - "@Japanese Support"
+
+    - name: yum install 
+      yum:  name="{{ item }}" state=installed 
+      with_items:
+        - traceroute
+        - unzip
+        - iperf
+        - oracle-rdbms-server-12cR1-preinstall
+        - tigervnc-server
+        - screen
+        - nfs-utils
+        - dnsmasq
+        - scsi-target-utils
+        - iscsi-initiator-utils
+        - firefox.x86_64
+        - xrdp
+        - git
+        - bison
+        - flex
+        - db4-devel
+        - libselinux-python
+        - python-pip
+        - ansible
+        - cloud-init
+        - qemu-img
+    
+    - name: yum clean all
+      shell: >-
+        yum clean all
+
+    - name: pip install awscli
+      pip: name=awscli state=latest
+
+    - name: iproute install
+      shell: >-
+        git clone git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git &&
+        cd iproute2 &&
+        git checkout v3.17.0 &&
+        ./configure &&
+        make &&
+        make DESTDIR=/usr/share install
+
+    - name: xrdp-ini
+      shell: >-
+        curl -L http://www.mail-archive.com/xrdp-devel@lists.sourceforge.net/msg00263/km-e0010411.ini -o ./km-e0010411.ini &&
+        cp ./km-e0010411.ini /etc/xrdp/km-e0010411.ini &&
+        cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-0411.ini &&
+        cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0200411.ini && 
+        cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0210411.ini 
+    
+    - name: "copy vxlan.init"
+      copy: src=vxlan.init dest={{ WORK_DIR }} mode=755
+   
+    - name: "create /etc/vxlan  directory"
+      file: dest=/etc/vxlan state=directory
+ 
+    - name: "install vxlan.init"
+      shell: chdir={{ WORK_DIR }} install -o root -g root -m 755 vxlan.init /etc/init.d/vxlan
+
+    - name: "copy cloud.cfg"
+      copy: src=cloud.cfg dest=/etc/cloud/cloud.cfg
+
+    - name: "copy rc.local"
+      copy: src=rc.local dest=/etc/rc.d/rc.local
+
+    - name: Create swap file
+      command: dd if=/dev/zero of={{ swap_file_path }} bs=1M count={{ swap_file_size_mb }}
+               creates="{{ swap_file_path }}"
+
+    - name: Change swap file permissions
+      file: path="{{ swap_file_path }}"
+            owner=root
+            group=root
+            mode=0600
+
+    - name: "Check swap file type"
+      command: file {{ swap_file_path }}
+      register: swapfile
+
+    - name: Make swap file
+      command: "sudo mkswap {{ swap_file_path }}"
+      when: swapfile.stdout.find('swap file') == -1
+
+    - name: Write swap entry in fstab
+      mount: name=none
+             src={{ swap_file_path }}
+             fstype=swap
+             opts=sw
+             passno=0
+             dump=0
+             state=present
+
+    - name: execute for public ami
+      shell: >-
+        rm -rf  /root/.ssh &&
+        rm -rf  /home/cloud-user/.ssh &&
+        echo "" > /var/log/boot.log &&
+        echo "" > /var/log/btmp &&
+        echo "" > /var/log/cron &&
+        echo "" > /var/log/dmesg &&
+        echo "" > /var/log/dmesg.old &&
+        echo "" > /var/log/lastlog &&
+        echo "" > /var/log/maillog &&
+        echo "" > /var/log/messages &&
+        echo "" > /var/log/secure &&
+        echo "" > /var/log/spooler &&
+        echo "" > /var/log/tallylog &&
+        echo "" > /var/log/wtmp &&
+        echo "" > /var/log/yum.log &&
+        echo "" > /var/log/audit/audit.log &&
+        history -c
+
+    - local_action:
+        module: ec2_ami
+        instance_id: "{{ ansible_ec2_instance_id }}"
+        wait: yes
+        region: "{{region}}"
+        name: install_base_rac
+    
+    - local_action:
+        module: ec2
+        state: 'absent'
+        instance_ids: "{{ ansible_ec2_instance_id }}"
+        region: "{{region}}"

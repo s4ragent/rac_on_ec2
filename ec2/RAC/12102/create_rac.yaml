@@ -1,0 +1,636 @@
+
+- hosts:
+    - localhost
+  sudo: yes
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tags:
+    - ec2_startup
+  tasks:
+    - name: "get controllerip" 
+      shell:  ip addr show eth0 | grep 'inet ' | awk -F '[ /]' '{print $6}' 
+      register: localhostip
+    
+    - name: "create /etc/vxlan directory"
+      file: dest=/etc/vxlan state=directory
+
+    - name: "update all.ip file with controllerip"
+      lineinfile: state=present create=yes insertafter=EOF line={{ localhostip.stdout }} dest=/etc/vxlan/all.ip
+    
+    - name: "setup vxlan(local public)"
+      local_action: shell ./common.sh createvxlanconf 0 host 0
+    
+    - name: "setup vxlan(local private)"
+      local_action: shell ./common.sh createvxlanconf 1 host 0
+
+- hosts:
+    - localhost
+  sudo: yes
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tags:
+    - ec2_startup
+  tasks:
+    - name: "provision of node1"
+      local_action: 
+        module: ec2
+        keypair: "{{ keypair }}"
+        assign_public_ip: False
+        instance_type: "{{ instance_type }}"
+        image: "{{ image }}"
+        zone: "{{ zone }}"
+        count: 1
+        group: "{{ group }}"
+        region: "{{ region }}"
+        volumes: 
+          - device_name: "{{ MEDIA_DEV_NAME }}"
+            snapshot: "{{ media_snapshot_id }}"
+            device_type: gp2
+            delete_on_termination: true
+          - device_name: "{{ ORACLE_HOME_DEVICE }}"
+            snapshot: "{{ oracle_home_snapshot_id }}"
+            volume_size: "{{ ORACLE_HOME_SIZE }}"
+            device_type: gp2
+            delete_on_termination: true
+        spot_price: "{{ spot_price }}"
+        wait: true
+        instance_tags: '{"LaunchGroup":"Oracle_On_EC2","Role":"db_1"}'
+      run_once: true
+      register: ec2_1
+    
+    - name: Add all instance private IPs to host group
+      add_host: hostname={{ item.private_ip }} groupname="tag_Role_db_1"
+      with_items: ec2_1.instances
+    
+    - name: Add all instance private IPs to host group
+      add_host: hostname={{ item.private_ip }} groupname="tag_LaunchGroup_Oracle_On_EC2"
+      with_items: ec2_1.instances
+
+    - name: wait for instances to listen on port:22
+      wait_for:
+        state=started
+        host={{ item.private_ip }}
+        port=22
+      with_items: ec2_1.instances
+
+    - name: update all.ip file
+      local_action: lineinfile state=present create=yes insertafter=EOF line={{ item.private_ip }} dest=/etc/vxlan/all.ip
+      with_items: ec2_1.instances
+
+- hosts:
+    - localhost
+  sudo: yes
+  tags:
+    - ec2_startup
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "provision of node2 and others"
+      local_action: 
+        module: ec2
+        keypair: "{{ keypair }}"
+        assign_public_ip: False
+        instance_type: "{{ instance_type }}"
+        zone: "{{ zone }}"
+        image: "{{ image }}"
+        count: "{{ num_of_nodes - 1 }}"
+        group: "{{ group }}"
+        region: "{{ region }}"
+        volumes: 
+          - device_name: "{{ ORACLE_HOME_DEVICE }}"
+            snapshot: "{{ oracle_home_snapshot_id }}"
+            volume_size: "{{ ORACLE_HOME_SIZE }}"
+            device_type: gp2
+            delete_on_termination: true
+        spot_price: "{{ spot_price }}"
+        spot_wait_timeout: 1800
+        wait: true
+        wait_timeout: 600
+        instance_tags: '{"LaunchGroup":"Oracle_On_EC2","Role":"db_other"}'
+      run_once: true
+      register: ec2_other
+    
+    - name: Add all instance private IPs to host group
+      add_host: hostname={{ item.private_ip }} groupname="tag_Role_db_other"
+      with_items: ec2_other.instances
+    
+    - name: Add all instance private IPs to host group
+      add_host: hostname={{ item.private_ip }} groupname="tag_LaunchGroup_Oracle_On_EC2"
+      with_items: ec2_other.instances
+
+    - name: wait for instances to listen on port:22
+      wait_for:
+        state=started
+        host={{ item.private_ip }}
+        port=22
+      with_items: ec2_other.instances
+
+    - name: update all.ip file
+      local_action: lineinfile state=present create=yes insertafter=EOF line={{ item.private_ip }} dest=/etc/vxlan/all.ip
+      with_items: ec2_other.instances
+
+- hosts:
+    - tag_Role_db_1
+  remote_user: root
+  sudo: yes
+  tags:
+    - ec2_startup
+    - initvxlan
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "create work directory"
+      file: dest={{ WORK_DIR }} state=directory
+
+    - name: "copy varfile"
+      copy: src=vars.yml dest={{ WORK_DIR }} mode=755
+
+    - name: "copy common.sh"
+      copy: src=common.sh dest={{ WORK_DIR }} mode=755
+    
+    - name: "setup vxlan (remote public)"
+      shell: chdir={{ WORK_DIR }} ./common.sh createvxlanconf 0 real 1
+    
+    - name: "setup vxlan (remote private)"
+      shell: chdir={{ WORK_DIR }} ./common.sh createvxlanconf 1 real 1
+    
+
+- hosts:
+    - tag_Role_db_other
+  max_fail_percentage: 0
+  remote_user: root
+  sudo: yes
+  tags:
+    - ec2_startup
+    - initvxlan
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "create work directory"
+      file: dest={{ WORK_DIR }} state=directory
+
+    - name: "copy varfile"
+      copy: src=vars.yml dest={{ WORK_DIR }} mode=755
+
+    - name: "copy common.sh"
+      copy: src=common.sh dest={{ WORK_DIR }} mode=755
+    
+    - name: "setup vxlan (remote public)"
+      shell: chdir={{ WORK_DIR }} ./common.sh createvxlanconf 0 real {{ item.0 + 2}}
+      run_once: yes
+      delegate_to: "{{ item.1 }}"
+      with_indexed_items: play_hosts
+    
+    - name: "setup vxlan (remote private)"
+      shell: chdir={{ WORK_DIR }} ./common.sh createvxlanconf 1 real {{ item.0 + 2}}
+      run_once: yes
+      delegate_to: "{{ item.1 }}"
+      with_indexed_items: play_hosts
+    
+    - name: sleep 15s
+      local_action: shell sleep 15s
+      run_once: true
+    
+
+- hosts:
+    - tag_LaunchGroup_Oracle_On_EC2
+  remote_user: root
+  sudo: yes
+  tags:
+    - ec2_startup
+    - vxlan_reload
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "copy all.ip file"
+      copy: src="/etc/vxlan/all.ip"  dest=/etc/vxlan/all.ip mode=755
+    
+    - name: vxlan reload(remote)
+      shell: service vxlan reload
+    
+    - name: vxlan reload(local)
+      local_action: shell service vxlan reload
+      run_once: true
+
+
+- hosts:
+    - node1
+    - node_other
+  max_fail_percentage: 0
+  remote_user: root
+  sudo: yes
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: "update /etc/hosts file"
+      local_action: lineinfile state=present create=yes insertafter=EOF line="{{ inventory_hostname }} {{ fqdn }} {{ hostname }}" dest=/etc/hosts
+      tags:
+        - ssh
+        - hosts
+        - preinstall
+    
+- hosts:
+    - node1
+    - node_other
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "copy varfile"
+      copy: src=vars.yml dest={{ WORK_DIR }} mode=755
+      tags:
+        - copy
+        - preinstall
+
+    - name: "copy common.sh"
+      copy: src=common.sh dest={{ WORK_DIR }} mode=755
+      tags:
+        - copy
+        - preinstall
+    
+    - name: "change hostname"
+      hostname: name="{{ fqdn }}"
+      tags:
+        - hostname
+        - preinstall
+
+    - name: "create user"
+      shell: chdir={{ WORK_DIR }} ./common.sh createuser
+      tags:
+        - user
+        - ssh
+        - preinstall
+
+    - name: create known_hosts
+      local_action: shell ./common.sh createsshkey {{ num_of_nodes }}
+      run_once: true
+      tags:
+        - ssh
+        - preinstall
+
+    - name: "create .ssh directory"
+      file: dest=/home/{{ item }}/.ssh state=directory owner={{ item }} group=oinstall mode=0700
+      with_items:
+        - oracle
+        - grid
+      tags:
+        - ssh
+        - preinstall
+
+    - name: copy authorized_keys
+      copy: src=id_rsa dest=/home/{{ item }}/.ssh/id_rsa mode=0600 owner={{ item }} group=oinstall
+      with_items:
+        - oracle
+        - grid
+      tags:
+        - ssh
+        - preinstall
+
+    - name: copy authorized_keys
+      copy: src=id_rsa.pub dest=/home/{{ item }}/.ssh/authorized_keys mode=0600 owner={{ item }} group=oinstall
+      with_items:
+        - oracle
+        - grid
+      tags:
+        - ssh
+        - preinstall
+
+    - name: copy known_hosts
+      copy: src=known_hosts dest=/home/{{ item }}/.ssh/known_hosts mode=0600 owner={{ item }} group=oinstall
+      with_items:
+        - oracle
+        - grid
+      tags:
+        - ssh
+        - preinstall
+
+    - name: copy root pubkey
+      shell: cat /root/.ssh/authorized_keys >> /home/{{ item }}/.ssh/authorized_keys
+      with_items:
+        - oracle
+        - grid
+      tags:
+        - ssh
+        - preinstall
+    
+    - name: "nfsclient"
+      shell: chdir={{ WORK_DIR }} ./common.sh createnfsclient {{ NFS_SERVER }}
+      tags:
+        - nfsclient
+
+    - name: "oraclehome"
+      shell: chdir={{ WORK_DIR }} ./common.sh createoraclehome
+      tags:
+        - oraclehome
+        - preinstall
+
+    - name: "dns"
+      shell: chdir={{ WORK_DIR }} ./common.sh createdns
+      tags:
+        - dns
+        - preinstall
+
+    - name: "dhcp"
+      lineinfile: state=present create=yes insertafter=EOF line="supersede domain-name-servers 127.0.0.1;" dest=/etc/dhcp/dhclient-eth0.conf
+      tags:
+        - dns
+        - preinstall
+    
+    - name: "kernelparameter"
+      shell: chdir={{ WORK_DIR }} ./common.sh setupkernel
+      ignore_errors: yes
+      tags:
+        - kernelparameter
+        - preinstall
+
+- hosts:
+    - node1
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "mount media"
+      mount: name="{{ MEDIA_PATH }}" src="{{ MEDIA_DEV_NAME }}1" fstype=ext4 state=mounted
+      tags:
+        - media
+
+    - name: "creatersp"
+      shell: chdir={{ WORK_DIR }} ./common.sh creatersp {{ num_of_nodes }}
+      tags:
+        - rsp
+    
+    - name: "createimg"
+      shell: chdir={{ WORK_DIR }} ./common.sh createimg {{ size_of_img }}
+      tags:
+        - img
+
+- hosts:
+    - node1
+    - node_other
+  max_fail_percentage: 0
+  remote_user: root
+  tags:
+    - reboot
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: reboot
+      shell: sleep 2s && /sbin/reboot
+
+    - name: wait for the server to go down (reboot)
+      local_action: wait_for host={{ inventory_hostname }} port=22 state=stopped 
+
+    - name: wait for the server to come up
+      local_action: wait_for host={{ inventory_hostname }} port=22 delay=60
+
+- hosts:
+    - node1
+    - node_other
+  max_fail_percentage: 0
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "cleanGIDB"
+      shell: chdir={{ WORK_DIR }} ./common.sh cleanGIDB
+      tags:
+        - cleanGIDB
+
+    - name: "create_clonepl_startsh"
+      shell: chdir={{ WORK_DIR }} ./common.sh create_clonepl_startsh {{ num_of_nodes }}
+      tags:
+        - clonepl_startsh
+
+- hosts:
+    - node1
+  remote_user: grid
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "install gridsoftware"
+      local_action: shell ssh -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null grid@{{ inventory_hostname }} {{ MEDIA_PATH }}/grid/runInstaller -silent -responseFile /home/grid/grid.rsp -ignoreSysPrereqs -ignorePrereq
+      tags:
+        - gridswinstall
+
+- hosts:
+    - node1
+    - node_other
+  max_fail_percentage: 0
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "gridstartsh"
+      shell: chdir=/home/grid ./start.sh
+      become: yes
+      become_user: grid
+      #local_action: shell ssh -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null grid@{{ inventory_hostname }} /home/grid/start.sh
+      async: "{{ ASYNC }}"
+      poll: 10
+      tags:
+        - gridstartsh
+
+    - name: "orainventory"
+      shell: chdir={{ ORAINVENTORY }} ./orainstRoot.sh -silent
+      tags:
+        - orainventory
+
+- hosts:
+    - node1
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "configsh"
+      local_action: shell ssh -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null grid@{{ inventory_hostname }} {{ GRID_ORACLE_HOME }}/crs/config/config.sh -silent -responseFile /home/grid/grid.rsp -ignoreSysPrereqs -ignorePrereq 
+      tags:
+        - configsh
+
+    - name: "grid 1st root.sh"
+      shell: chdir={{ GRID_ORACLE_HOME }} ./root.sh -silent
+      tags:
+        - gridrootsh
+
+- hosts:
+    - node_other
+  max_fail_percentage: 0
+  remote_user: root
+  serial: 10
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "grid other node root.sh"
+      shell: chdir={{ GRID_ORACLE_HOME }} ./root.sh -silent
+      async: "{{ ASYNC }}"
+      poll: 10
+      tags:
+        - gridrootsh
+
+- hosts:
+    - node1
+  remote_user: grid
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "asmca"
+      shell: chdir={{ GRID_ORACLE_HOME }} ./cfgtoollogs/configToolAllCommands RESPONSE_FILE=/home/grid/asm.rsp
+      tags:
+        - asmca
+
+    - name: "crsctl"
+      shell: chdir={{ GRID_ORACLE_HOME }} ./bin/crsctl status resource -t
+
+- hosts:
+    - node1
+  remote_user: oracle
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "install oraclesoftware"
+      local_action: shell ssh -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null oracle@{{ inventory_hostname }} {{ MEDIA_PATH }}/database/runInstaller -silent -responseFile /home/oracle/db.rsp -ignoreSysPrereqs -ignorePrereq
+      tags:
+        - dbswinstall
+
+- hosts:
+    - node1
+    - node_other
+  max_fail_percentage: 0
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "orastartsh"
+#      local_action: shell ssh -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null oracle@{{ inventory_hostname }} /home/oracle/start.sh
+      shell: chdir=/home/oracle ./start.sh
+      become: yes
+      become_user: oracle
+      async: "{{ ASYNC }}"
+      poll: 10
+      tags:
+        - orastartsh
+
+    - name: "oracle root.sh"
+      shell: chdir={{ ORA_ORACLE_HOME }} ./root.sh -silent
+      tags:
+        - orarootsh
+
+- hosts:
+    - node1
+  remote_user: oracle
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "copy varfile"
+      copy: src=vars.yml dest=/home/oracle mode=755 owner=oracle
+      tags:
+        - dbca
+
+    - name: "copy common.sh"
+      copy: src=common.sh dest=/home/oracle mode=755 owner=oracle
+      tags:
+        - dbca
+
+    - name: "dbca"
+      shell: chdir=/home/oracle ./common.sh exedbca {{ num_of_nodes }}
+      tags:
+        - dbca
+
+- hosts:
+    - node1
+  remote_user: grid
+  vars_files:
+    - ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: "install oraclesoftware"
+      shell: chdir={{ GRID_ORACLE_HOME }} ./bin/crsctl status resource -t
+      tags:
+        - gridstatus
+
+- hosts:
+    - node1
+  remote_user: root
+  vars_files:
+    - ./vars.yml
+  tags:
+    - snapshot
+  gather_facts: false
+  tasks:
+    - name: route
+      shell: route del -net 169.254.0.0 netmask 255.255.0.0 dev vxlan0
+      ignore_errors: yes
+    - name: route
+      shell: route del -net 169.254.0.0 netmask 255.255.0.0 dev vxlan1
+      ignore_errors: yes
+    - name: route
+      shell: route add -net 169.254.0.0 netmask 255.255.0.0 dev eth0 metric 0
+      ignore_errors: yes
+    
+    - ec2_facts:
+
+    - name: "stop crs and clean gi/db software"
+      shell: chdir={{ GRID_ORACLE_HOME }}  ./bin/crsctl stop crs
+      ignore_errors: yes
+
+    - local_action: ec2_snapshot
+        instance_id="{{ hostvars[inventory_hostname]['ansible_ec2_instance_id'] }}"
+        device_name="{{ ORACLE_HOME_DEVICE }}"
+        region="{{ region }}"
+        description="snapshot of installed GIDB software"
+
+
+- hosts:
+    - node1
+  remote_user: oracle
+  vars_files:
+    - ./vars.yml
+  tags:
+    - deletedb
+  gather_facts: false
+  tasks:
+    - name: "copy varfile"
+      copy: src=vars.yml dest=/home/oracle mode=755 owner=oracle
+
+    - name: "copy common.sh"
+      copy: src=common.sh dest=/home/oracle mode=755 owner=oracle
+
+    - name: "dbca"
+      shell: chdir=/home/oracle ./common.sh deletedb 
+
+- hosts:
+    - node1
+  remote_user: oracle
+  vars_files:
+    - ./vars.yml
+  tags:
+    - dbca2
+  gather_facts: false
+  tasks:
+    - name: "copy varfile"
+      copy: src=vars.yml dest=/home/oracle mode=755 owner=oracle
+
+    - name: "copy common.sh"
+      copy: src=common.sh dest=/home/oracle mode=755 owner=oracle
+
+    - name: "dbca"
+      shell: chdir=/home/oracle ./common.sh exedbca2 {{ num_of_nodes }}
