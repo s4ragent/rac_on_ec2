@@ -4,7 +4,7 @@
 # version:      0.1
 # author:       s4ragent
 MEMSIZE=1200m
-SLEEP=30s
+SLEEP=1s
 PRELOG=/var/log/retmpfs.log
 case "$1" in
   start)
