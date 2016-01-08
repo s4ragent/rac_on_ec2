@@ -35,7 +35,9 @@ RUN install -o root -g root -m 755 /usr/local/bin/retmpfs.sh /etc/init.d/retmpfs
 RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
 #vxlan
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/vxlan.init /usr/local/bin/vxlan.init
-RUN  install -o root -g root -m 755 /usr/local/bin/vxlan.init /etc/init.d/vxlan
+RUN sed -i -e "s/\/sbin\/ip/\/usr\/share\/sbin\/ip/g" /usr/local/bin/vxlan.init
+RUN sed -i -e "s/\/sbin\/bridge/\/usr\/share\/sbin\/bridge/g" /usr/local/bin/vxlan.init
+RUN install -o root -g root -m 755 /usr/local/bin/vxlan.init /etc/init.d/vxlan
 #
 WORKDIR /
 RUN rm -rf iproute2
