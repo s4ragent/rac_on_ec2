@@ -7,8 +7,8 @@ RUN yum -y reinstall glibc-common
 RUN yum -y clean all
 
 #createpreoracle
-COPY preoracle.sh /usr/local/bin/preoracle.sh
-COPY preoracle.service /etc/systemd/system/preoracle.service
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/retmpfs.sh /usr/local/bin/retmpfs.sh
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/retmpfs.service /etc/systemd/system/retmpfs.service
 RUN chmod 0700 /usr/local/bin/preoracle.sh
 #RUN   systemctl enable preoracle.service
 
@@ -19,8 +19,8 @@ RUN systemctl stop getty@tty1.service &&\
     systemctl mask serial-getty@ttyS0.service
 
 #vxlan
-COPY vxlan.init /usr/local/bin/vxlan.init
-COPY vxlan.service /etc/systemd/system/vxlan.service
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/vxlan.init /usr/local/bin/vxlan.init
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/vxlan.service /etc/systemd/system/vxlan.service
 RUN chmod 0700 /usr/local/bin/vxlan.init
 RUN mkdir /etc/vxlan
 #RUN systemctl enablevxlan.service
