@@ -16,5 +16,5 @@ case "$1" in
     ;;
   stop)
     rm -f /var/lock/subsys/tmpfs
-    ;;                                                                                                                                                                     
+    ;;
 esac
