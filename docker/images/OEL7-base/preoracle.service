@@ -1,0 +1,14 @@
+[Unit]
+Description=preoracle
+Requires=network.target
+Before=network.target remote-fs.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/preoracle.sh start
+ExecStop=/usr/local/bin/preoracle.sh stop
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
