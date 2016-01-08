@@ -21,10 +21,11 @@ RUN userdel -r oracle;\
     groupadd -g 1003 asmoper&&\
     useradd -u 501 -m -g oinstall -G dba,oper,asmdba -d /home/oracle -s /bin/bash -c"Oracle Software Owner" oracle &&\
     useradd -u 1001 -m -g oinstall -G asmadmin,asmdba,asmoper -d /home/grid -s /bin/bash -c "Grid Infrastructure Owner" grid
-#enableping
-RUN chmod u+s /usr/bin/ping
 #createdns
 #createrules
 #createpreoracle
+COPY preoracle.sh /usr/local/bin/preoracle.sh
+RUN  install -o root -g root -m 755 /usr/local/bin/preoracle.sh /etc/init.d/preoracle && chkconfig preoracle on
 #disabletty
 RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
+ENTRYPOINT ["/sbin/init"]
