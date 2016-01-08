@@ -5,17 +5,23 @@ RUN yum -y install epel-release
 RUN yum --enablerepo=ol7_addons -y install oracle-rdbms-server-12cR1-preinstall tar net-tools expect dnsmasq bind-utils
 RUN yum -y reinstall glibc-common
 RUN yum -y clean all
+
 #createpreoracle
 COPY preoracle.sh /usr/local/bin/preoracle.sh
-RUN  install -o root -g root -m 755 /usr/local/bin/preoracle.sh /etc/init.d/preoracle
-
+COPY preoracle.service /etc/systemd/system/preoracle.service
+RUN chmod 0700 /usr/local/bin/prenetwork.sh
+#RUN   systemctl enable preoracle.service
 
 #disabletty
-RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
+RUN systemctl stop getty@tty1.service &&\
+    systemctl mask getty@tty1.service &&\
+    systemctl stop serial-getty@ttyS0.service &&\
+    systemctl mask serial-getty@ttyS0.service
+
 #vxlan
 COPY vxlan.init /usr/local/bin/vxlan.init
-RUN  install -o root -g root -m 755 /usr/local/bin/vxlan.init /etc/init.d/vxlan
-#
-WORKDIR /
-RUN rm -rf iproute2
+COPY vxlan.service /etc/systemd/system/vxlan.service
+RUN chmod 0700 /usr/local/bin/vxlan.init
+#RUN systemctl enablevxlan.service
+
 ENTRYPOINT ["/sbin/init"]
