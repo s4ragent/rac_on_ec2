@@ -1,0 +1,15 @@
+[Unit]
+Description=vxlan
+Requires=network.target
+After=network.target
+Before=ohasd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/vxlan.init start
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
