@@ -9,5 +9,5 @@ RUN curl -L http://www.mail-archive.com/xrdp-devel@lists.sourceforge.net/msg0026
         cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-0411.ini &&\
         cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0200411.ini &&\
         cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0210411.ini
-rm ./km-e0010411.ini
+RUN rm ./km-e0010411.ini
 ENTRYPOINT ["/sbin/init"]
