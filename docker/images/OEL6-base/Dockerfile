@@ -46,4 +46,6 @@ RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/
 COPY vxlan.init /usr/local/bin/vxlan.init
 RUN  install -o root -g root -m 755 /usr/local/bin/vxlan.init /etc/init.d/vxlan
 #
+WORKDIR /
+RUN rm -rf iproute2
 ENTRYPOINT ["/sbin/init"]
