@@ -29,12 +29,12 @@ RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.
 WORKDIR iproute2
 RUN git checkout v3.17.0 && ./configure && make && make DESTDIR=/usr/share install
 #createpreoracle
-COPY preoracle.sh /usr/local/bin/preoracle.sh
-RUN  install -o root -g root -m 755 /usr/local/bin/preoracle.sh /etc/init.d/preoracle
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/retmpfs.sh /usr/local/bin/retmpfs.sh
+RUN install -o root -g root -m 755 /usr/local/bin/retmpfs.sh /etc/init.d/retmpfs
 #disabletty
 RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
 #vxlan
-COPY vxlan.init /usr/local/bin/vxlan.init
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/vxlan.init /usr/local/bin/vxlan.init
 RUN  install -o root -g root -m 755 /usr/local/bin/vxlan.init /etc/init.d/vxlan
 #
 WORKDIR /
