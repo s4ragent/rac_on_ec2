@@ -9,7 +9,7 @@ RUN yum -y clean all
 #createpreoracle
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/retmpfs.sh /usr/local/bin/retmpfs.sh
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/retmpfs.service /etc/systemd/system/retmpfs.service
-RUN chmod 0700 /usr/local/bin/preoracle.sh
+RUN chmod 0700 /usr/local/bin/retmpfs.sh
 #RUN   systemctl enable preoracle.service
 
 #disabletty
