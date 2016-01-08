@@ -9,7 +9,7 @@ RUN yum -y clean all
 #createpreoracle
 COPY preoracle.sh /usr/local/bin/preoracle.sh
 COPY preoracle.service /etc/systemd/system/preoracle.service
-RUN chmod 0700 /usr/local/bin/prenetwork.sh
+RUN chmod 0700 /usr/local/bin/preoracle.sh
 #RUN   systemctl enable preoracle.service
 
 #disabletty
