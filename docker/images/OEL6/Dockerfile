@@ -6,13 +6,8 @@ WORKDIR iproute2
 RUN git checkout v3.17.0 && ./configure && make && make DESTDIR=/usr/share install
 #delete&create group/user
 RUN userdel -r oracle;\
-    userdel -r grid;\
     groupdel dba;\
     groupdel oinstall;\
-    groupdel oper;\
-    groupdel asmadmin;\
-    groupdel asmdba;\
-    groupdel asmoper;\
     groupadd -g 601 oinstall &&\
     groupadd -g 602 dba &&\
     groupadd -g 603 oper &&\
