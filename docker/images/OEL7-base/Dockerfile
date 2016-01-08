@@ -27,7 +27,7 @@ RUN mkdir /etc/vxlan
 #RUN systemctl enablevxlan.service
 
 RUN rm -f /etc/systemd/system/default.target
-RUN touch ${rootfs_path}/etc/fstab
+RUN touch /etc/fstab
 RUN ln -s /dev/null /etc/systemd/system/udev.service
 RUN ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 # Make systemd honor SIGPWR
