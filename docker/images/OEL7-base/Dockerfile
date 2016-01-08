@@ -22,6 +22,7 @@ RUN systemctl stop getty@tty1.service &&\
 COPY vxlan.init /usr/local/bin/vxlan.init
 COPY vxlan.service /etc/systemd/system/vxlan.service
 RUN chmod 0700 /usr/local/bin/vxlan.init
+RUN mkdir /etc/vxlan
 #RUN systemctl enablevxlan.service
 
 ENTRYPOINT ["/sbin/init"]
