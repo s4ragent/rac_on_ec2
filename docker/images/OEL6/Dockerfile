@@ -23,4 +23,8 @@ COPY preoracle.sh /usr/local/bin/preoracle.sh
 RUN  install -o root -g root -m 755 /usr/local/bin/preoracle.sh /etc/init.d/preoracle && chkconfig preoracle on
 #disabletty
 RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
+#vxlan
+COPY vxlan.init /usr/local/bin/vxlan.init
+RUN  install -o root -g root -m 755 /usr/local/bin/vxlan.init /etc/init.d/vxlan && chkconfig vxlan on
+#
 ENTRYPOINT ["/sbin/init"]
