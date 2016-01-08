@@ -22,6 +22,8 @@ RUN yum -y install git\
                    net-tools\
                    expect\
                    bind-utils
+RUN yum -y reinstall glibc-common
+RUN yum -y clean all
 #iproute2
 RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git 
 WORKDIR iproute2
