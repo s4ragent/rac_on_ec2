@@ -1,6 +1,6 @@
 FROM oraclelinux:7
 #enable epel
-RUN yum -y install epel-release
+RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 #installpackages
 RUN yum --enablerepo=ol7_addons -y install oracle-rdbms-server-12cR1-preinstall tar net-tools expect dnsmasq bind-utils
 RUN yum -y reinstall glibc-common
