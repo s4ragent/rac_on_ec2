@@ -5,7 +5,7 @@ RUN mkdir -p /selinux &&\
     mv /usr/sbin/selinuxenabled /usr/sbin/selinuxenabled.lxcorig &&\
     ln -s /bin/false /usr/sbin/selinuxenabled &&\
     sed -i '/^session.*pam_loginuid.so/s/^session/# session/' /etc/pam.d/login &&\
-    sed -i '/^session.*pam_loginuid.so/s/^session/# session/' /etc/pam.d/sshd &&
+    sed -i '/^session.*pam_loginuid.so/s/^session/# session/' /etc/pam.d/sshd
 WORKDIR /lib64/security/
 RUN mv pam_loginuid.so pam_loginuid.so.disabled &&\
     ln -s pam_permit.so pam_loginuid.so
