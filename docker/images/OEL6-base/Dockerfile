@@ -69,4 +69,5 @@ RUN mkdir /etc/vxlan
 #
 WORKDIR /
 RUN rm -rf iproute2
-ENTRYPOINT ["/sbin/init"]
+VOLUME [ “/sys/fs/cgroup” ]
+CMD ["/sbin/init"]
