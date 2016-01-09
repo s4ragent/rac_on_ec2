@@ -16,7 +16,9 @@ RUN rm -f /etc/systemd/system/default.target &&\
     ln -s /usr/lib/systemd/system/halt.target /etc/systemd/system/sigpwr.target &&\
     sed -e 's/^ConditionPathExists=/# ConditionPathExists=/' \
         -e 's/After=dev-%i.device/After=/' \
-        < /lib/systemd/system/getty\@.service > /etc/systemd/system/getty\@.service
+        < /lib/systemd/system/getty\@.service > /etc/systemd/system/getty\@.service &&\
+    ln -s /dev/null /etc/systemd/system/getty@tty1.service &&\
+    ln -s /dev/null /etc/systemd/system/serial-getty@ttyS0.service
 #enable epel
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 #installpackages
