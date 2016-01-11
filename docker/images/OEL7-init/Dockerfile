@@ -19,3 +19,5 @@ RUN rm -f /etc/systemd/system/default.target &&\
         < /lib/systemd/system/getty\@.service > /etc/systemd/system/getty\@.service &&\
     ln -s /dev/null /etc/systemd/system/getty@tty1.service &&\
     ln -s /dev/null /etc/systemd/system/serial-getty@ttyS0.service
+VOLUME [ “/sys/fs/cgroup” ]
+CMD ["/sbin/init"]
