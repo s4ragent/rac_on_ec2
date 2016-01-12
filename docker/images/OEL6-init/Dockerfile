@@ -27,5 +27,5 @@ RUN sed -i 's|.sbin.start_udev||' /etc/rc.sysinit &&\
     echo 'exec /sbin/shutdown -h now "SIGPWR received"' >> /etc/init/power-status-changed.conf
 #disabletty
 RUN 	mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
-VOLUME [ “/sys/fs/cgroup” ]
+WORKDIR /
 CMD ["/sbin/init"]
