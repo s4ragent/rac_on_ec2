@@ -30,7 +30,7 @@ RUN yum -y clean all
 #
 RUN chkconfig xrdp on
 RUN chkconfig iptables off
-ADD Xclients /etc/skel/.Xclients
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/Xclients /etc/skel/.Xclients
 RUN chmod +x /etc/skel/.Xclients
 #iproute2
 RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git 
