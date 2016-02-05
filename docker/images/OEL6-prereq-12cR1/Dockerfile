@@ -43,7 +43,7 @@ grid - nproc 16384\n\
 grid - nofile 65536\n\
 grid soft stack 10240\n\
 " >> /etc/security/limits.d/oracle-rdbms-server-12cR1-preinstall.conf
-ADD hosts /tmp/hosts
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/hosts /tmp/hosts
 RUN echo -e "listen-address=127.0.0.1\n\
 resolv-file=/etc/resolv.dnsmasq.conf\n\
 conf-dir=/etc/dnsmasq.d\n\
@@ -64,4 +64,4 @@ RUN  mkdir ${MOUNT_PATH} && \
      mkdir -p ${ORA_ORACLE_BASE} && \
      chown oracle:oinstall ${ORA_ORACLE_BASE} && \
      chmod -R 775 ${MOUNT_PATH}
-ADD all.ip /etc/vxlan/all.ip
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/all.ip /etc/vxlan/all.ip
