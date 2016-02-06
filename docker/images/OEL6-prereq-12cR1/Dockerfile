@@ -65,3 +65,5 @@ RUN  mkdir ${MOUNT_PATH} && \
      chown oracle:oinstall ${ORA_ORACLE_BASE} && \
      chmod -R 775 ${MOUNT_PATH}
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/all.ip /etc/vxlan/all.ip
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/createvxlanconf.sh /root/createvxlanconf.sh
+RUN chmod 755 /root/createvxlanconf.sh
