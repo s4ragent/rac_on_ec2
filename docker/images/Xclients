@@ -1,6 +1,6 @@
 #!/bin/bash
 souce  ~/.bash_profile
-if [ $LANG = 'ja_JP.UTF-8' ]; then
+if [ "$LANG" = 'ja_JP.UTF-8' ]; then
   export XMODIFIERS="@im=ibus"
   export XMODIFIER="@im=ibus"
   export GTK_IM_MODULE=ibus
