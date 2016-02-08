@@ -5,3 +5,7 @@ ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/Xc
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/Xclients /etc/skel/.Xclients-ja
 RUN chmod +x /etc/skel/.Xclients
 RUN chmod +x /etc/skel/.Xclients-ja
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/km-e0010411.ini /etc/xrdp/km-e0010411.ini
+RUN cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-0411.ini &&\
+    cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0200411.ini &&\
+    cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0210411.ini
