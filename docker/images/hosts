@@ -4,6 +4,11 @@ fe00::0 ip6-localnet
 ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
+###scan###
+192.168.0.80 scan.public scan
+192.168.0.81 scan.public scan
+192.168.0.82 scan.public scan
+##########
 192.168.0.101 node001.public node001
 192.168.0.201 node001-vip.public node001-vip
 192.168.0.102 node002.public node002
@@ -68,3 +73,13 @@ ff02::2 ip6-allrouters
 192.168.0.231 node031-vip.public node031-vip
 192.168.0.132 node032.public node032
 192.168.0.232 node032-vip.public node032-vip
+###others###
+192.168.0.160 nfs1.public nfs1
+192.168.0.161 nfs2.public nfs2
+192.168.0.162 oradb1.public oradb1
+192.168.0.162 oradb2.public oradb2
+192.168.0.163 oem1.public oem1
+192.168.0.164 oem2.public oem2
+192.168.0.165 client1.public client1
+192.168.0.166 client2.public client2
+##########
