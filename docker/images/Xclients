@@ -1,2 +1,3 @@
 #!/bin/bash
+souce  ~/.bash_profile
 exec xfce4-session
