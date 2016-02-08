@@ -2,7 +2,6 @@ FROM s4ragent/oracle-rac:OEL6-init
 #install epel
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 #installpackages
-RUN yum -y groupinstall Xfce
 RUN yum -y install git\
                    traceroute\
                    unzip\
@@ -11,7 +10,6 @@ RUN yum -y install git\
                    screen\
                    nfs-utils\
                    dnsmasq\
-                   firefox.x86_64\
                    git\
                    bison\
                    flex\
@@ -22,16 +20,9 @@ RUN yum -y install git\
                    tar\
                    net-tools\
                    expect\
-                   bind-utils\
-                   xrdp\
-                   tigervnc-server
+                   bind-utils
 RUN yum -y reinstall glibc-common
 RUN yum -y clean all
-#
-RUN chkconfig xrdp on
-RUN chkconfig iptables off
-ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/Xclients /etc/skel/.Xclients
-RUN chmod +x /etc/skel/.Xclients
 #iproute2
 RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git 
 WORKDIR iproute2
