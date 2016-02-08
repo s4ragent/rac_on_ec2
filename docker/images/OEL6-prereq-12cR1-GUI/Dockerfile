@@ -84,4 +84,5 @@ ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/al
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/createvxlanconf.sh /root/createvxlanconf.sh
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/createsshkey.sh /root/createsshkey.sh
 RUN chmod 755 /root/createvxlanconf.sh
+RUN chmod 755 /root/createsshkey.sh
 RUN /root/createsshkey.sh
