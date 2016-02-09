@@ -40,7 +40,7 @@ getip () {
 
 createhosts()
 {
-	cat >> $HOSTFILE <<EOF
+	cat > $HOSTFILE <<EOF
 127.0.0.1 localhost
 ::1 localhost ip6-localhost ip6-loopback
 fe00::0 ip6-localnet
