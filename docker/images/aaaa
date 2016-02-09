@@ -110,6 +110,4 @@ case "$1" in
   "createvxlanconf" ) shift;createvxlanconf $*;;
   "createhosts" ) shift;createhosts $*;;
   "createsshkey" ) shift;createsshkey $*;;
-
-  * ) echo "Ex " ;;
 esac
