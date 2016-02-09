@@ -59,7 +59,6 @@ gridja - nproc 16384\n\
 gridja - nofile 65536\n\
 gridja soft stack 10240\n\
 " >> /etc/security/limits.conf
-ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/hosts /tmp/hosts
 RUN echo -e "listen-address=127.0.0.1\n\
 resolv-file=/etc/resolv.dnsmasq.conf\n\
 conf-dir=/etc/dnsmasq.d\n\
@@ -81,8 +80,7 @@ RUN  mkdir ${MOUNT_PATH} && \
      chown oracle:oinstall ${ORA_ORACLE_BASE} && \
      chmod -R 775 ${MOUNT_PATH}
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/all.ip /etc/vxlan/all.ip
-ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/createvxlanconf.sh /root/createvxlanconf.sh
-ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/createsshkey.sh /root/createsshkey.sh
-RUN chmod 755 /root/createvxlanconf.sh
-RUN chmod 755 /root/createsshkey.sh
-RUN /root/createsshkey.sh
+ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/util.sh /root/util.sh
+RUN chmod 755 /root/util.sh
+RUN /root/util.sh createsshkey
+RUN /root/util.sh createhosts
