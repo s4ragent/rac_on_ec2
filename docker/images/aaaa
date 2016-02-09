@@ -3,7 +3,7 @@ DOMAIN_NAME="public"
 SCAN_NAME="scan"
 BASE_IP=50
 NETWORKS=("192.168.0.0" "192.168.100.0" "192.168.200.0")
-HOSTFILE=$HOSTFILE
+HOSTFILE=/tmp/hosts
 
 
 getnodename ()
@@ -108,6 +108,8 @@ done
 
 case "$1" in
   "createvxlanconf" ) shift;createvxlanconf $*;;
-  "createvxlanconf" ) shift;createvxlanconf $*;;
+  "createhosts" ) shift;createhosts $*;;
+  "createsshkey" ) shift;createsshkey $*;;
+
   * ) echo "Ex " ;;
 esac
