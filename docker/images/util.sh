@@ -5,6 +5,15 @@ BASE_IP=50
 NETWORKS=("192.168.0.0" "192.168.100.0" "192.168.200.0" "192.168.250.0")
 HOSTFILE=/tmp/hosts
 
+getnumberfromhost()
+{
+	case "$1" in
+        node*)
+                echo $1 | grep -Po  '[1-9]{1,3}'
+        ;;
+esac
+}
+
 
 getnodename ()
 {
