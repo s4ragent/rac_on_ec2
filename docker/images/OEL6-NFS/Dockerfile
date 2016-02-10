@@ -5,10 +5,10 @@ RUN mkdir /shared_config &&\
     mkdir /shared_home &&\
     mkdir /shared_data
 RUN echo -e "#for asm#\n\
-/shared_config               *(rw,sync,no_wdelay,insecure_locks,no_root_squash)
-/shared_grid                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash)
-/shared_home                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash)
-/shared_data                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash)
+/shared_config               *(rw,sync,no_wdelay,insecure_locks,no_root_squash) \n\
+/shared_grid                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash) \n\
+/shared_home                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash) \n\
+/shared_data                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash) \n\
 " >> /etc/exports
 RUN chown grid:oinstall /shared_config &&\
     chown grid:oinstall /shared_grid &&\
