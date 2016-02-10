@@ -10,5 +10,8 @@ RUN echo -e "#for asm#\n\
 /shared_home                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash)
 /shared_data                 *(rw,sync,no_wdelay,insecure_locks,no_root_squash)
 " >> /etc/exports
+RUN chown grid:oinstall /shared_config &&\
+    chown grid:oinstall /shared_grid &&\
+    chown oracle:oinstall /shared_home &&\
+    chown grid:oinstall /shared_data
 RUN chkconfig nfs on && service nfs restart
-RUN /root/createvxlanconf.sh 33
