@@ -1,4 +1,4 @@
-FROM s4ragent/oracle-rac:OEL6-prereq-12cR1-GUI
+FROM s4ragent/oracle-rac:OEL6-prereq-RAC
 #https://oracle-base.com/articles/12c/oracle-db-12cr1-rac-installation-on-oracle-linux-6-using-nfs
 RUN mkdir /shared_config &&\
     mkdir /shared_grid &&\
