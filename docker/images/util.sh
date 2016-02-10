@@ -2,7 +2,7 @@ NODEPREFIX="node"
 DOMAIN_NAME="public"
 SCAN_NAME="scan"
 BASE_IP=50
-NETWORKS=("192.168.0.0" "192.168.100.0" "192.168.200.0")
+NETWORKS=("192.168.0.0" "192.168.100.0" "192.168.200.0" "192.168.250.0")
 HOSTFILE=/tmp/hosts
 
 
@@ -26,15 +26,17 @@ getip () {
 		echo "${SEGMENT}`expr $BASE_IP - 20 ` ${SCAN_NAME}.${DOMAIN_NAME} ${SCAN_NAME}";
 		echo "${SEGMENT}`expr $BASE_IP - 20 + 1` ${SCAN_NAME}.${DOMAIN_NAME} ${SCAN_NAME}";
 		echo "${SEGMENT}`expr $BASE_IP - 20 + 2` ${SCAN_NAME}.${DOMAIN_NAME} ${SCAN_NAME}";
-	elif [ $2 == "other" ] ; then
+	elif [ $2 == "nas" ] ; then
 		echo "${SEGMENT}`expr $BASE_IP - 20 + 3` nas1.${DOMAIN_NAME} nas1";
 		echo "${SEGMENT}`expr $BASE_IP - 20 + 4` nas1.${DOMAIN_NAME} nas2";
-		echo "${SEGMENT}`expr $BASE_IP - 20 + 5` db1.${DOMAIN_NAME} db1";
-		echo "${SEGMENT}`expr $BASE_IP - 20 + 6` db2.${DOMAIN_NAME} db2";
-		echo "${SEGMENT}`expr $BASE_IP - 20 + 7` oem1.${DOMAIN_NAME} oem1";
-		echo "${SEGMENT}`expr $BASE_IP - 20 + 8` oem2.${DOMAIN_NAME} oem2";						
-		echo "${SEGMENT}`expr $BASE_IP - 20 + 9` client1.${DOMAIN_NAME} client1";
-		echo "${SEGMENT}`expr $BASE_IP - 20 + 10` client2.${DOMAIN_NAME} client2";		
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 5` nas1.${DOMAIN_NAME} nas3";
+	elif [ $2 == "other" ] ; then
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 6` db1.${DOMAIN_NAME} db1";
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 7` db2.${DOMAIN_NAME} db2";
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 8` oem1.${DOMAIN_NAME} oem1";
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 9` oem2.${DOMAIN_NAME} oem2";						
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 10` client1.${DOMAIN_NAME} client1";
+		echo "${SEGMENT}`expr $BASE_IP - 20 + 11` client2.${DOMAIN_NAME} client2";		
 	fi;
 }
 
@@ -50,6 +52,7 @@ ff02::2 ip6-allrouters
 EOF
 
 	getip 0 scan >> $HOSTFILE
+	getip 3 nas >> $HOSTFILE
 	getip 0 other >> $HOSTFILE
 	for i in `seq 1 64`; do 
 		nodename=`getnodename $i`;
