@@ -33,7 +33,7 @@ export TEMP=/tmp\n\
 export PATH=\$ORACLE_HOME/bin:\$ORACLE_HOME/jdk/bin:\${PATH}\n\
 export LD_LIBRARY_PATH=\$ORACLE_HOME/lib\n\
 " >> /home/grid/.bash_profile && \
-cat /home/grid/.bash_profile > /home/gridja/.bash_profile
+cat /home/grid/.bash_profile > /home/gridja/.bash_profile &&\
 echo "export LANG=ja_JP.UTF-8" >> /home/oracleja/.bash_profile &&\
 echo "export LANG=ja_JP.UTF-8" >> /home/gridja/.bash_profile
 ## create oraclehome
