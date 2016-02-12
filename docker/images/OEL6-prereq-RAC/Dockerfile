@@ -43,3 +43,5 @@ ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/ut
 RUN chmod 755 /root/util.sh
 RUN /root/util.sh createsshkey
 RUN /root/util.sh createhosts
+## enable service & disable service
+RUN chkconfig xrdp on && chkconfig iptables off && chkconfig NetworkManager off
