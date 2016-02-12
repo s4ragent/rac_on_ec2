@@ -1,4 +1,4 @@
-FROM s4ragent/oracle-rac:OEL6-base-GUI
+FROM s4ragent/oracle-rac:OEL6-base
 RUN userdel -r oracle && groupdel dba && groupdel oinstall && \
     groupadd -g 54321 dba && groupadd -g 54322 oinstall && \
     groupadd -g 54323 asmdba && groupadd -g 54324 asmoper && groupadd -g 54325 asmadmin && \
