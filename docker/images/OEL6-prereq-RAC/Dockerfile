@@ -45,3 +45,4 @@ RUN /root/util.sh createsshkey
 RUN /root/util.sh createhosts
 ## enable service & disable service
 RUN chkconfig xrdp on && chkconfig iptables off && chkconfig NetworkManager off
+ENTRYPOINT ["/sbin/init"]
