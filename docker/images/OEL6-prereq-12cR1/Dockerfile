@@ -1,4 +1,4 @@
-FROM s4ragent/oracle-rac:OEL6-prereq-RAC
+FROM s4ragent/oracle-rac:OEL6-prereq-Common
 ENV MOUNT_PATH /u01
 ENV ORA_ORACLE_BASE /u01/app/oracle
 ENV ORA_ORACLE_HOME /u01/app/oracle/product/12.1.0/dbhome_1
