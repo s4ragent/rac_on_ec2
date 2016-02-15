@@ -41,7 +41,7 @@ RUN chkconfig dnsmasq on
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/all.ip /etc/vxlan/all.ip
 ADD https://raw.githubusercontent.com/s4ragent/RAC-on-XX/master/docker/images/util.sh /root/util.sh
 RUN chmod 755 /root/util.sh
-RUN /root/util.sh createsshkey
+#RUN /root/util.sh createsshkey
 RUN /root/util.sh createhosts
 ## enable service & disable service
 RUN chkconfig xrdp on && chkconfig iptables off && chkconfig NetworkManager off
