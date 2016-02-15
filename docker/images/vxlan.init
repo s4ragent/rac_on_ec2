@@ -1,5 +1,5 @@
 # vxlan         vxlan init configuration
-# chkconfig:    2345 40 80
+# chkconfig:    2345 11 89
 # version:      0.1
 # author:       knopp
 
