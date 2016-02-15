@@ -19,7 +19,7 @@ changehostname()
 {
 	oel_version=`rpm -q oraclelinux-release --qf "%{version}"`
 	NEW_HOSTNAME="$1.{DOMAIN_NAME}"
-	case "$rhel_version" in
+	case "$oel_version" in
     		6*)
 		sed -i "s/HOSTNAME=.*/HOSTNAME=$NEW_HOSTNAME/g" /etc/sysconfig/network
         	;;
