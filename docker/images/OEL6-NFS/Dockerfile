@@ -14,4 +14,4 @@ RUN chown grid:oinstall /shared_config &&\
     chown grid:oinstall /shared_grid &&\
     chown oracle:oinstall /shared_home &&\
     chown grid:oinstall /shared_data
-RUN chkconfig nfs on && service nfs restart
+RUN sed -i "# chkconfig: - 30 60/# chkconfig: - 41 60/g" /etc/init.d/nfs && chkconfig nfs on 
