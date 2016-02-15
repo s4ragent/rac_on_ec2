@@ -160,7 +160,7 @@ done
 createvxlanfromhost()
 {
 	base_number=`getnumber $1`
-       number=`expr $base_number - $BASE_IP`
+	number=`expr $base_number - $BASE_IP`
 	createvxlanconf $number
 }
 
