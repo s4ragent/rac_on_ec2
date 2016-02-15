@@ -15,7 +15,7 @@ BASE_IP=$NODE_BASE_IP
 NETWORKS=("192.168.0.0" "192.168.100.0" "192.168.200.0" "192.168.250.0")
 HOSTFILE=/tmp/hosts
 
-changehost()
+changehostname()
 {
 	oel_version=`rpm -q oraclelinux-release --qf "%{version}"`
 	NEW_HOSTNAME="$1.{DOMAIN_NAME}"
@@ -184,4 +184,5 @@ case "$1" in
   "createsshkey" ) shift;createsshkey $*;;
   "getnumber" ) shift;getnumber $*;;
   "createvxlanfromhost" ) shift;createvxlanfromhost $*;;
+  "changehostname" ) shift;changehostname $*;;  
 esac
