@@ -16,7 +16,7 @@ RUN chown grid:oinstall /shared_config &&\
     chmod 775 /shared_grid &&\
     chown oracle:oinstall /shared_home &&\
     chmod 775 /shared_home &&\
-    chown grid:oinstall /shared_data
+    chown grid:oinstall /shared_data &&\
     chmod 775 /shared_data
 RUN chkconfig nfs on
 RUN echo "/etc/init.d/nfs restart" >> /etc/rc.d/rc.local
