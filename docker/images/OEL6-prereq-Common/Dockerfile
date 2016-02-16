@@ -45,5 +45,4 @@ RUN chmod 755 /root/util.sh
 RUN /root/util.sh createhosts
 ## enable service & disable service
 RUN chkconfig xrdp on && chkconfig iptables off && chkconfig NetworkManager off
-RUN sed -i "s/# chkconfig: 345 25 75/# chkconfig: 345 50 75/g" /etc/init.d/netfs
 ENTRYPOINT ["/sbin/init"]
