@@ -12,8 +12,5 @@ nas1:/shared_home   $ORA_ORACLE_HOME  nfs  rw,bg,hard,nointr,tcp,vers=3,timeo=60
 nas1:/shared_data   $MOUNT_PATH/oradata  nfs  rw,bg,hard,nointr,tcp,vers=3,timeo=600,rsize=32768,wsize=32768,actimeo=0  0 0 \n\
 " >> /etc/fstab
 RUN mkdir -p $MOUNT_PATH/shared_config &&\
-    chown grid:oinstall $MOUNT_PATH/shared_config &&\
     mkdir -p $ORA_ORACLE_HOME &&\
-    chown oracle:oinstall $ORA_ORACLE_HOME &&\
-    mkdir -p $MOUNT_PATH/oradata &&\
-    chown grid:oinstall $MOUNT_PATH/oradata
+    mkdir -p $MOUNT_PATH/oradata
