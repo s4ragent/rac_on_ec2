@@ -4,12 +4,8 @@ RUN userdel -r oracle && groupdel dba && groupdel oinstall && \
     groupadd -g 54323 asmdba && groupadd -g 54324 asmoper && groupadd -g 54325 asmadmin && \
     useradd -u 54321 -g oinstall -G dba,asmdba,asmadmin oracle && \
     useradd -u 54322 -g oinstall -G asmadmin,asmdba,asmoper grid && \
-    useradd -u 54323 -g oinstall -G dba,asmdba,asmadmin oracleja && \
-    useradd -u 54324 -g oinstall -G asmadmin,asmdba,asmoper gridja && \    
     echo "oracle:oracle123" | chpasswd && \
-    echo "grid:grid123" | chpasswd && \
-    echo "oracleja:oracle123" | chpasswd && \
-    echo "gridja:grid123" | chpasswd
+    echo "grid:grid123" | chpasswd
 RUN sed -i 's/oracle/#oracle/' /etc/security/limits.d/oracle-rdbms-server-12cR1-preinstall.conf && \
 sed -i 's/oracle/#oracle/' /etc/security/limits.conf && \
 echo -e "\n\
@@ -19,12 +15,6 @@ oracle soft stack 10240\n\
 grid - nproc 16384\n\
 grid - nofile 65536\n\
 grid soft stack 10240\n\
-oracleja - nproc 16384\n\
-oracleja - nofile 65536\n\
-oracleja soft stack 10240\n\
-gridja - nproc 16384\n\
-gridja - nofile 65536\n\
-gridja soft stack 10240\n\
 " >> /etc/security/limits.conf
 RUN echo -e "listen-address=127.0.0.1\n\
 resolv-file=/etc/resolv.dnsmasq.conf\n\
