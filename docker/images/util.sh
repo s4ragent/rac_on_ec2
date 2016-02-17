@@ -185,6 +185,23 @@ setlangja()
 	echo "export LANG=ja_JP.UTF-8" >> /home/grid/.bash_profile
 }
 
+initasmimg()
+{
+	nfscount=`mount | grep nfs | wc -l`
+	if [ ! -e /u01/shared_config/ocr.img -a $nfscount -gt 0 ] ; then
+		dd if=/dev/zero of=/u01/shared_config/ocr.img bs=1M count=`expr 2 \* 1024`
+		chmod 0660 /u01/shared_config/ocr.img
+		dd if=/dev/zero of=/u01/oradata/oradata.img bs=1M count=`expr 8 \* 1024`
+		chmod 0660 /u01/oradata/oradata.img
+		chown -R grid:oinstall /u01/shared_config
+		chown -R oracle:oinstall /u01/oradata
+		source /home/grid/.bash_profile
+		chown -R grid:oinstall $ORACLE_HOME
+		source /home/oracle/.bash_profile
+		chown -R oracle:oinstall $ORACLE_HOME
+        fi
+}
+
 case "$1" in
   "createvxlanconf" ) shift;createvxlanconf $*;;
   "createhosts" ) shift;createhosts $*;;
@@ -192,5 +209,6 @@ case "$1" in
   "getnumber" ) shift;getnumber $*;;
   "createvxlanfromhost" ) shift;createvxlanfromhost $*;;
   "changehostname" ) shift;changehostname $*;;  
-  "setlangja" ) shift;setlangja $*;; 
+  "setlangja" ) shift;setlangja $*;;
+  "initasmimg" ) shift;initasmimg $*;;
 esac
