@@ -178,6 +178,13 @@ createvxlanfromhost()
 	createvxlanconf $number
 }
 
+
+setlangja()
+{
+	echo "export LANG=ja_JP.UTF-8" >> /home/oracle/.bash_profile
+	echo "export LANG=ja_JP.UTF-8" >> /home/grid/.bash_profile
+}
+
 case "$1" in
   "createvxlanconf" ) shift;createvxlanconf $*;;
   "createhosts" ) shift;createhosts $*;;
@@ -185,4 +192,5 @@ case "$1" in
   "getnumber" ) shift;getnumber $*;;
   "createvxlanfromhost" ) shift;createvxlanfromhost $*;;
   "changehostname" ) shift;changehostname $*;;  
+  "setlangja" ) shift;setlangja $*;; 
 esac
