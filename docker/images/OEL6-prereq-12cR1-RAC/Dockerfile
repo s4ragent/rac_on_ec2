@@ -14,3 +14,4 @@ nas1:/shared_data   $MOUNT_PATH/oradata  nfs  rw,bg,hard,nointr,tcp,vers=3,timeo
 RUN mkdir -p $MOUNT_PATH/shared_config &&\
     mkdir -p $ORA_ORACLE_HOME &&\
     mkdir -p $MOUNT_PATH/oradata
+RUN echo "/root/util.sh initasmimg" >> /etc/rc.d/rc.local
