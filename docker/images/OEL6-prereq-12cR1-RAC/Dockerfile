@@ -16,5 +16,4 @@ RUN mkdir -p $MOUNT_PATH/shared_config &&\
     mkdir -p $ORA_ORACLE_HOME &&\
     chown oracle:oinstall $ORA_ORACLE_HOME &&\
     mkdir -p $MOUNT_PATH/oradata &&\
-    chown grid:oinstall $MOUNT_PATH/oradata &&\
-    chmod -R 775 ${MOUNT_PATH}
+    chown grid:oinstall $MOUNT_PATH/oradata
