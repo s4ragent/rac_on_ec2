@@ -50,7 +50,7 @@ RUN cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-0411.ini &&\
     cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0200411.ini &&\
     cp /etc/xrdp/km-e0010411.ini /etc/xrdp/km-e0210411.ini
 
-WORKDIR /
-RUN rm -rf iproute2
+#WORKDIR /
+#RUN rm -rf iproute2
 RUN mv /etc/init/tty.conf /etc/init/tty.bk; mv /etc/init/serial.conf /etc/init/serial.bk
 CMD ["/sbin/init"]
