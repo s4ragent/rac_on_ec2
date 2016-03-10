@@ -11,13 +11,13 @@ RUN yum -y groupinstall Xfce "Japanese Support" &&\
                    screen\
                    nfs-utils\
                    dnsmasq\
-#                   git\
+                   git\
 #                   bison\
 #                   flex\
 #                   db4-devel\
-#                   libselinux-python\
-#                   python-pip\
-#                   ansible\
+                   libselinux-python\
+                   python-pip\
+                   ansible\
                    tar\
                    net-tools\
                    expect\
